@@ -27,7 +27,7 @@
             <tr>
                 <td>{{$d->product_name}}</td>
                 <td>{{$d->category->category_name}}</td>
-                <td>{{$d->user->id}}</td>
+                <td>{{$d->user->detail->displayName}}</td>
                 <td>{{$d->price}}</td>
                 <td>{{$d->photo}}</td>
             </tr>

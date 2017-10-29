@@ -14,6 +14,7 @@
             <li><a href="{{url("/")}}">Home</a></li>
             <li><a href="{{url("/products")}}">Products</a></li>
             <li><a href="{{url("/broadcast")}}">Broadcast</a></li>
+            <li><a href="{{url("/category")}}">Category</a></li>
           </ul>
         </div>
       </nav>
