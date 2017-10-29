@@ -28,14 +28,22 @@ class RequestController extends Controller
     }
   
     public function doFollow($request){
-      $data = new User();
-      if($request!=null && $request["source"]["type"]=="user"){
-        $data->id = $request["source"]["userId"];
+      $data = User::withTrashed()->where("id_line", $request["source"]["userId"])->first();
+      if($data!=null){
+        User::withTrashed()->find($data->id)->restore();
+      }else{
+        $data = new User();
+        if($request!=null && $request["source"]["type"]=="user"){
+          $data->id_line = $request["source"]["userId"];
+        }
+        $data->save(); 
       }
-      $data->save();
     }
   
     public function doUnfollow($request){
-      
+      $data = User::where("id_line", $request["source"]["userId"])->first();
+      if($data!=null){
+        User::find($data->id)->delete();
+      }
     }
 }

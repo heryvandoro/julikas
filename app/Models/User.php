@@ -8,5 +8,4 @@ class User extends Model
 {
     use SoftDeletes;
     protected $table = "users";
-    public $incrementing = false;
 }

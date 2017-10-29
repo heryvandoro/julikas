@@ -24,7 +24,9 @@
                 <td>{{$d->category_parent_name}}</td>
                 <td>
                     @foreach($d->categories as $x)
-                      {{$x->category_name}}
+                      <div class="chip">
+                          {{$x->category_name}}
+                      </div>
                     @endforeach
                 </td>
                 <td>
