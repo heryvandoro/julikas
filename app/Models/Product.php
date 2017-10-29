@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use SoftDeletes;
 
-class User extends Model
+class Product extends Model
 {
     use SoftDeletes;
-    protected $table = "users";
-    public $incrementing = false;
+    protected $table = "products";
 }

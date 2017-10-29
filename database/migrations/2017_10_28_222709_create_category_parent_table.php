@@ -13,7 +13,7 @@ class CreateCategoryParentTable extends Migration
     public function up()
     {
         Schema::create("category_parents", function(Blueprint $table){
-          $table->increments("category_parent_id");
+          $table->increments("id");
           $table->string("category_parent_name");
           $table->timestamps();
           $table->softDeletes();
