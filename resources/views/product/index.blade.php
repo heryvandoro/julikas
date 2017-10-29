@@ -6,41 +6,32 @@
       <table class="table responsive-table bordered highlight" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Owner</th>
+                <th>Price</th>
+                <th>Photo</th>
             </tr>
         </thead>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Owner</th>
+                <th>Price</th>
+                <th>Photo</th>
             </tr>
         </tfoot>
         <tbody>
+            @foreach($data as $d)
             <tr>
-                <td>Tiger Nixon</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011/04/25</td>
-                <td>$320,800</td>
+                <td>{{$d->product_name}}</td>
+                <td>{{$d->category->category_name}}</td>
+                <td>{{$d->user->id}}</td>
+                <td>{{$d->price}}</td>
+                <td>{{$d->photo}}</td>
             </tr>
-            <tr>
-                <td>Donna Snider</td>
-                <td>Customer Support</td>
-                <td>New York</td>
-                <td>27</td>
-                <td>2011/01/25</td>
-                <td>$112,000</td>
-            </tr>
+            @endforeach
         </tbody>
       </table> 
     </div>
