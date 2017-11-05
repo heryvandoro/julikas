@@ -12,7 +12,20 @@ class BOT{
     }*/
     public static function makeRequest($method, $url, $data=array()){
       $client = new Client(['base_uri' => 'https://api.line.me/v2/bot/']);
-      $data['headers'] = ['Authorization' => 'Bearer f/Nd/Zw1j+tjbkmxvxCAsNr4MutVu5WBcR+ZG2EcchZ9fycAnG6lmlnZ91X5zdqhy9Bacp7nnmuz/vhaQ+gnzf7qp3gRM+Lrb/T+X55L4AuwwXScOWsniieVu8N+oC8a3dMvxhL+M1QA09LX1F1GHQdB04t89/1O/w1cDnyilFU='];
-      return json_decode((string)($client->request($method, $url, $data)->getBody()));
+      $body['headers'] = ['Authorization' => 'Bearer f/Nd/Zw1j+tjbkmxvxCAsNr4MutVu5WBcR+ZG2EcchZ9fycAnG6lmlnZ91X5zdqhy9Bacp7nnmuz/vhaQ+gnzf7qp3gRM+Lrb/T+X55L4AuwwXScOWsniieVu8N+oC8a3dMvxhL+M1QA09LX1F1GHQdB04t89/1O/w1cDnyilFU='];
+      $body['json'] = $data;
+      $result = $client->request($method, $url, $body);
+      try{
+        return json_decode((string)($result->getBody()));
+      }catch(Exception $e){
+        return response()->json(["status"=>"success"]);
+      }
+    }
+  
+    public static function replyMessages($replyToken, $messages){
+       self::makeRequest("POST", "message/reply", [
+         "replyToken" => $replyToken,
+         "messages" => $messages
+       ]);
     }
 }
