@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Log;
 use App\Models\User;
+use App\Models\Group;
 use App\Helpers\BOT;
 use App\Helpers\STR;
 use App\Models\Product;
@@ -28,6 +29,8 @@ class RequestController extends Controller
           case "unfollow" : $this->doUnfollow($source);
           break;
           case "message" : $this->doMessages($source);
+          break;
+          case "join" : $this->doJoin($source);
           break;
       }
       
@@ -113,7 +116,7 @@ class RequestController extends Controller
     }
   
     public function doReplyGameYesNo($request){
-      $temp = STR::clean($request['message']['text']);
+      $temp = STR::clean(strtolower($request['message']['text']));
       $result = "";
       $arr1 = str_split($temp);
       $sum = 0;
@@ -131,16 +134,16 @@ class RequestController extends Controller
     }
   
     public function doUnknown($request){
-      $temp = STR::clean($request['message']['text']);
+      $temp = STR::clean(strtolower($request['message']['text']));
       $result = "";
       switch($temp){
-        case "hai-spongebob" :
+        case "haispongebob" :
           $result = "waduh petrik!!!";
           break;
-        case "ruang-berapa" :
+        case "ruangberapa" :
           $result = "coba cek 724 aja";
           break;
-        case "ada-ruang" :
+        case "adaruang" :
           $result = "ada";
           break;
       }
@@ -148,6 +151,19 @@ class RequestController extends Controller
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $result)
         ));
+      }
+    }
+  
+    public function doJoin($request){
+      $data = Group::withTrashed()->where("id_line", $request["source"]["groupId"])->first();
+      if($data!=null){
+        Group::withTrashed()->find($data->id)->restore();
+      }else{
+        $data = new Group();
+        if($request!=null && $request["source"]["type"]=="group"){
+          $data->id_line = $request["source"]["groupId"];
+        }
+        $data->save(); 
       }
     }
 }

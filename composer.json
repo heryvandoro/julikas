@@ -7,7 +7,6 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
-        //"linecorp/line-bot-sdk": "^2.3",
         "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
