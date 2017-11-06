@@ -12,3 +12,4 @@ Route::get("/products", "ProductController@index");
 Route::get("/category", "CategoryController@index");
 Route::get("/users", "UserController@index");
 Route::get("/groups", "GroupController@index");
+Route::get("/games", "GameController@index");

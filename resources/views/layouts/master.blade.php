@@ -11,20 +11,29 @@
         <li><a href="{{url("/users")}}">Users</a></li>
         <li><a href="{{url("/groups")}}">Groups</a></li>
       </ul>
+      <ul id="dropdown_browse" class="dropdown-content">
+        <li><a href="{{url("/products")}}">Products</a></li>
+        <li><a href="{{url("/category")}}">Category</a></li>
+        <li><a href="{{url("/games")}}">Games</a></li>
+      </ul>
       <nav>
         <div class="nav-wrapper">
           <a href="#" class="brand-logo center">JuliKas</a>
           <ul id="nav-mobile" class="left hide-on-med-and-down">
             <li><a href="{{url("/")}}">Home</a></li>
             <li>
-              <a class="dropdown-button" href="#" data-activates="dropdown_accounts" data-beloworigin="true">
+              <a class="dropdown-button" href="#" data-activates="dropdown_accounts" data-beloworigin="true" data-hover="true">
                 Accounts
                 <i class="material-icons right">arrow_drop_down</i>
               </a>
             </li>
-            <li><a href="{{url("/Members")}}">Products</a></li>
+            <li>
+              <a class="dropdown-button" href="#" data-activates="dropdown_browse" data-beloworigin="true" data-hover="true">
+                Browse
+                <i class="material-icons right">arrow_drop_down</i>
+              </a>
+            </li>
             <li><a href="{{url("/broadcast")}}">Broadcast</a></li>
-            <li><a href="{{url("/category")}}">Category</a></li>
           </ul>
         </div>
       </nav>
