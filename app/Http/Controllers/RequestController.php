@@ -7,11 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Log;
 use App\Models\User;
 use App\Models\Group;
-use App\Helpers\BOT;
-use App\Helpers\STR;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Game;
 use App\Models\CategoryParent;
+use App\Helpers\BOT;
+use App\Helpers\STR;
+use App\Helpers\Constants;
 
 class RequestController extends Controller
 {
@@ -59,6 +61,7 @@ class RequestController extends Controller
   
     public function doMessages($request){
       $keyword = trim(strtolower($request['message']['text']));
+      //single command (for menu)
       switch($keyword){
         case "/products":
           $this->doReplyProducts($request);
@@ -67,8 +70,11 @@ class RequestController extends Controller
           $this->doReplyCategory($request);
           break;
       }
-      
-      if(STR::startsWith($keyword, "apakah")){
+      if(STR::startsWith($keyword, "/intro")){
+        $this->doReplyIntro($request);
+      }elseif(STR::startsWith($keyword, "/start")){
+        $this->doStartGame($request);
+      }elseif(STR::startsWith($keyword, "apakah")){
         $this->doReplyGameYesNo($request);
       }else{
         $this->doUnknown($request);
@@ -137,13 +143,13 @@ class RequestController extends Controller
       $temp = STR::clean(strtolower($request['message']['text']));
       $result = "";
       switch($temp){
-        case "haispongebob" :
+        case "hai-spongebob" :
           $result = "waduh petrik!!!";
           break;
-        case "ruangberapa" :
+        case "ruang-berapa" :
           $result = "coba cek 724 aja";
           break;
-        case "adaruang" :
+        case "ada-ruang" :
           $result = "ada";
           break;
       }
@@ -165,5 +171,57 @@ class RequestController extends Controller
         }
         $data->save(); 
       }
+    }
+  
+    public function doReplyIntro($request){
+      $temp = STR::clean(strtolower($request['message']['text']));
+      if($temp=="intro"){ 
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => Constants::$INTRO_GLOBAL)
+        ));
+      }else{
+        $temp = explode("-", $temp);
+        if(count($temp)==2){
+          $this->doReplyIntroGame($request);
+        }else{
+          BOT::replyMessages($request['replyToken'], array(
+            array("type" => "text","text" => Constants::$NOT_FOUND)
+          ));
+        }
+      }
+    }
+  
+    public function doReplyIntroGame($request){
+        $temp = STR::clean(strtolower($request['message']['text']));
+        $temp = explode("-", $temp);
+        $data = Game::where("game_name", $temp[1])->first();
+        $result = "";
+        if($data==null){
+           $result = Constants::$NOT_FOUND;
+        }else{
+           $result = $data->description;
+        }
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => $result)
+        ));
+    }
+  
+    public function doStartGame($request){
+        $temp = STR::clean(strtolower($request['message']['text']));
+        $temp = explode("-", $temp);
+        $result = "";
+        if(count($temp)!=2){
+            $result = Constants::$NOT_FOUND;
+        }else{
+            $data = Game::where("game_name", $temp[1])->first();
+            if($data==null){
+               $result = Constants::$NOT_FOUND;
+            }else{
+               //start game
+            }
+        }
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => $result)
+        ));
     }
 }
