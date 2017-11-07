@@ -14,32 +14,24 @@ use App\Models\Game;
 class IntroController extends Controller
 {
     public static function doReplyIntro($request){
-      $temp = STR::clean(strtolower($request['message']['text']));
-      if($temp=="intro"){ 
-        BOT::replyMessages($request['replyToken'], array(
-          array("type" => "text","text" => Constants::$INTRO_GLOBAL)
-        ));
-      }else{
-        $temp = explode("-", $temp);
-        if(count($temp)==2){
-          self::doReplyIntroGame($request);
-        }else{
-          BOT::replyMessages($request['replyToken'], array(
-            array("type" => "text","text" => Constants::$NOT_FOUND)
-          ));
-        }
-      }
+      BOT::replyMessages($request['replyToken'], array(
+        array("type" => "text","text" => Constants::$INTRO_GLOBAL)
+      ));
     }
   
     public static function doReplyIntroGame($request){
         $temp = STR::clean(strtolower($request['message']['text']));
         $temp = explode("-", $temp);
-        $data = Game::where("game_name", $temp[1])->first();
         $result = "";
-        if($data==null){
-           $result = Constants::$NOT_FOUND;
+        if(count($temp)==2){
+          $data = Game::where("game_name", $temp[1])->first();
+          if($data==null){
+             $result = Constants::$NOT_FOUND;
+          }else{
+             $result = $data->description;
+          }
         }else{
-           $result = $data->description;
+            $result = Constants::$NOT_FOUND;
         }
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $result)

@@ -13,11 +13,10 @@ class RequestController extends Controller
     public function index(Request $request){
       //save log
       LogController::saveLog($request->all());
-      
       $source = $request->events[0];
       
       switch($source["type"]){
-        case "follow" : UserController::doFollow($source);
+          case "follow" : UserController::doFollow($source);
           break;
           case "unfollow" : UserController::doUnfollow($source);
           break;
@@ -28,7 +27,6 @@ class RequestController extends Controller
           case "leave" : GroupController::doLeave($source);
           break;
       }
-      
       return response()->json(["status"=>200]);
     } 
   
@@ -42,9 +40,12 @@ class RequestController extends Controller
         case "/category":
           CategoryController::doReplyCategory($request);
           break;
+        case "/intro" :
+          IntroController::doReplyIntro($request);
+          break;
       }
       if(STR::startsWith($keyword, "/intro")){
-        IntroController::doReplyIntro($request);
+        IntroController::doReplyIntroGame($request);
       }elseif(STR::startsWith($keyword, "/start")){
         GameController::doStartGame($request);
       }elseif(STR::startsWith($keyword, "/join")){
