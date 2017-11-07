@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateGameSessionsTable extends Migration
+class CreateAnswersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,11 @@ class CreateGameSessionsTable extends Migration
      */
     public function up()
     {
-        Schema::create("game_sessions", function(Blueprint $table){
+        Schema::create("answers", function(Blueprint $table){
             $table->increments("id");
-            $table->string("game_id");
-            $table->string("starter_id"); //id line starter
-            $table->string("group_id");
-            $table->tinyInteger("status"); //0 waiting, 1 active, 2 canceled/expired/finished
+            $table->integer("question_id");
+            $table->string("text");
+            $table->integer("point");
             $table->softDeletes();
             $table->timestamps();
         });
@@ -30,6 +29,6 @@ class CreateGameSessionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists("game_sessions");
+        Schema::dropIfExists("answers");
     }
 }

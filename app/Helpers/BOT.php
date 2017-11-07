@@ -32,4 +32,7 @@ class BOT{
     public static function getProfile($user_id){
        return self::makeRequest("GET", "profile/".$user_id);
     }
+    public static function getGroupMemberProfile($group_id, $user_id){
+       return self::makeRequest("GET", "group/".$group_id."/member/".$user_id);
+    }
 }

@@ -11,6 +11,8 @@ use App\Models\GameSession;
 use App\Helpers\BOT;
 use App\Helpers\STR;
 use App\Helpers\Constants;
+use Carbon\Carbon;
+use App\Models\User;
 
 class GameController extends Controller
 {
@@ -22,7 +24,11 @@ class GameController extends Controller
     public function detail($id){
       $data = Game::with(["game_sessions"])->find($id);
       foreach($data->game_sessions as $d){
-        $d->user = BOT::getProfile($d->starter_id);
+        try{
+          $d->user = BOT::getProfile($d->starter_id);
+        }catch(\Exception $e){
+          $d->user = BOT::getGroupMemberProfile($d->group_id, $d->starter_id);
+        }
       }
       if($data!=null){
         return view("game.detail", compact(['data']));
@@ -31,8 +37,11 @@ class GameController extends Controller
       }
     }
   
-    public static function doStartGame($request){
+    public static function doCreateGame($request){
         $temp = STR::clean(strtolower($request['message']['text']));
+        $groupId = $request['source']['groupId'];
+        $starterId = $request['source']['userId'];
+      
         $temp = explode("-", $temp);
         $result = "";
         if(count($temp)!=2){
@@ -42,14 +51,19 @@ class GameController extends Controller
             if($data==null){
                $result = Constants::$NOT_FOUND;
             }else{
-               //start game
-               $new = new GameSession();
-               $new->game_id = $data->id;
-               $new->starter_id = $request['source']['userId'];
-               $new->group_id = $request['source']['groupId'];
-               $new->status = 0;
-               $new->save();
-               $mess = 'Game telah dimulai, silahkan balas "/join '.$data->game_name.'" untuk mulai bermain.';
+               $active_session = GameSession::where("group_id", $groupId)->where("status", "!=", 2)->get();
+               if(count($active_session)!=0){
+                 $mess = "Game : ".Game::find($active_session->first()->game_id)->game_name." sedang aktif. Tidak dapat memulai game lain.";
+               }else{
+                 //start game
+                 $new = new GameSession();
+                 $new->game_id = $data->id;
+                 $new->starter_id = $starterId;
+                 $new->group_id = $groupId;
+                 $new->status = 0;
+                 $new->save();
+                 $mess = 'Game telah dimulai, silahkan balas "/join '.$data->game_name.'" untuk mulai bermain.';
+               }
                BOT::replyMessages($request['replyToken'], array(
                 array("type" => "text","text" => $mess)
                ));
@@ -61,6 +75,27 @@ class GameController extends Controller
     }
     
     public static function doJoinGame($request){
-      
+        $groupId = $request['source']['groupId'];
+        $userId = $request['source']['userId'];
+        $current_user = User::where("id_line", $userId)->get()->first();
+        $mess = "";
+        if($current_user==null){
+          $mess = "Mohon maaf ".BOT::getGroupMemberProfile($groupId, $userId)->displayName.", kamu belum add JuliKas sebagai teman. Add dulu ya baru main!";
+        }else{
+          //search active session
+          $current_session = GameSession::where("group_id", $groupId)->where("status", 0)->get()->first();
+          if($current_session==null){
+            $mess = "Tidak ada game yang sedang aktif saat ini.";
+          }else{
+            $mess = "OK, kamu sudah join ke game.";
+          }
+        }
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => $mess)
+        ));
+    }
+  
+    public static function doStartGame($request){
+        
     }
 }

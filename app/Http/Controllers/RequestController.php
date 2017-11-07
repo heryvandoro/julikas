@@ -43,13 +43,14 @@ class RequestController extends Controller
         case "/intro" :
           IntroController::doReplyIntro($request);
           break;
+        case "/join" :
+          GameController::doJoinGame($request);
+          break; 
       }
       if(STR::startsWith($keyword, "/intro")){
         IntroController::doReplyIntroGame($request);
-      }elseif(STR::startsWith($keyword, "/start")){
-        GameController::doStartGame($request);
-      }elseif(STR::startsWith($keyword, "/join")){
-        GameController::doJoinGame($request);
+      }elseif(STR::startsWith($keyword, "/create")){
+        GameController::doCreateGame($request);
       }elseif(STR::startsWith($keyword, "apakah")){
         KerangController::doReplyKerang($request);
       }else{
