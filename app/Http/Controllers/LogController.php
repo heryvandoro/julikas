@@ -30,4 +30,9 @@ class LogController extends Controller
       
       return $data;
     }
+    public static function saveLog($request){
+        $data = new Log();
+        $data->messages = json_encode($request);
+        $data->save();
+    }
 }

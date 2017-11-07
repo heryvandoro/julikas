@@ -28,4 +28,8 @@ class BOT{
          "messages" => $messages
        ]);
     }
+  
+    public static function getProfile($user_id){
+       return self::makeRequest("GET", "profile/".$user_id);
+    }
 }

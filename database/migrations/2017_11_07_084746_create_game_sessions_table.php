@@ -17,7 +17,7 @@ class CreateGameSessionsTable extends Migration
             $table->string("game_id");
             $table->string("starter_id"); //id line starter
             $table->string("group_id");
-            $table->tinyInteger("status"); //0 waiting, 1 active, 2 canceled
+            $table->tinyInteger("status"); //0 waiting, 1 active, 2 canceled, 3 finished
             $table->softDeletes();
             $table->timestamps();
         });

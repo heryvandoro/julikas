@@ -15,4 +15,17 @@ class GroupController extends Controller
       $data = Group::all();
       return view("group.index", compact(['data']));
     }
+  
+    public static function doJoin($request){
+      $data = Group::withTrashed()->where("id_line", $request["source"]["groupId"])->first();
+      if($data!=null){
+        Group::withTrashed()->find($data->id)->restore();
+      }else{
+        $data = new Group();
+        if($request!=null && $request["source"]["type"]=="group"){
+          $data->id_line = $request["source"]["groupId"];
+        }
+        $data->save(); 
+      }
+    }
 }

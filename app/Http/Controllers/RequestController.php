@@ -10,6 +10,7 @@ use App\Models\Group;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Game;
+use App\Models\GameSession;
 use App\Models\CategoryParent;
 use App\Helpers\BOT;
 use App\Helpers\STR;
@@ -19,106 +20,46 @@ class RequestController extends Controller
 {
     public function index(Request $request){
       //save log
-      $data = new Log();
-      $data->messages = json_encode($request->all());
-      $data->save();
+      LogController::saveLog($request->all());
       
       $source = $request->events[0];
       
       switch($source["type"]){
-          case "follow" : $this->doFollow($source);
+        case "follow" : UserController::doFollow($source);
           break;
-          case "unfollow" : $this->doUnfollow($source);
+          case "unfollow" : UserController::doUnfollow($source);
           break;
           case "message" : $this->doMessages($source);
           break;
-          case "join" : $this->doJoin($source);
+          case "join" : GroupController::doJoin($source);
           break;
       }
       
       return response()->json(["status"=>200]);
-    }
-  
-    public function doFollow($request){
-      $data = User::withTrashed()->where("id_line", $request["source"]["userId"])->first();
-      if($data!=null){
-        User::withTrashed()->find($data->id)->restore();
-      }else{
-        $data = new User();
-        if($request!=null && $request["source"]["type"]=="user"){
-          $data->id_line = $request["source"]["userId"];
-        }
-        $data->save(); 
-      }
-    }
-  
-    public function doUnfollow($request){
-      $data = User::where("id_line", $request["source"]["userId"])->first();
-      if($data!=null){
-        User::find($data->id)->delete();
-      }
-    }
+    } 
   
     public function doMessages($request){
       $keyword = trim(strtolower($request['message']['text']));
       //single command (for menu)
       switch($keyword){
         case "/products":
-          $this->doReplyProducts($request);
+          ProductController::doReplyProducts($request);
           break;
         case "/category":
-          $this->doReplyCategory($request);
+          CategoryController::doReplyCategory($request);
           break;
       }
       if(STR::startsWith($keyword, "/intro")){
         $this->doReplyIntro($request);
       }elseif(STR::startsWith($keyword, "/start")){
         $this->doStartGame($request);
+      }elseif(STR::startsWith($keyword, "/join")){
+        $this->doJoinGame($request);
       }elseif(STR::startsWith($keyword, "apakah")){
         $this->doReplyGameYesNo($request);
       }else{
         $this->doUnknown($request);
       }
-    }
-  
-    public function doReplyProducts($request){
-      $data = Product::all()->take(5);
-      $messages = array();
-      foreach($data as $d){
-         array_push($messages, array(
-              "type" => "text",
-              "text" => $d->product_name." - ".$d->price
-         ));
-      }
-      BOT::replyMessages($request['replyToken'], $messages);
-    }
-  
-    public function doReplyCategory($request){
-      $data = CategoryParent::all()->take(5);
-      $messages = array();
-      $item = array();
-      foreach($data as $d){
-         array_push($item, array(
-            "title"=> "Category",
-            "text"=> $d->category_parent_name,
-            "actions"=> [
-                            [
-                                "type"=> "postback",
-                                "label"=> "View Sub Category",
-                                "data"=> "test"
-                            ],
-                       ]
-            ));
-      }
-      array_push($messages, array(
-          "type" => "template",
-          "altText"=> "Parent Category",
-          "template" => [
-              "type" => "carousel",
-              "columns" => $item
-          ])
-      );
-      BOT::replyMessages($request['replyToken'], $messages);
     }
   
     public function doReplyGameYesNo($request){
@@ -157,19 +98,6 @@ class RequestController extends Controller
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $result)
         ));
-      }
-    }
-  
-    public function doJoin($request){
-      $data = Group::withTrashed()->where("id_line", $request["source"]["groupId"])->first();
-      if($data!=null){
-        Group::withTrashed()->find($data->id)->restore();
-      }else{
-        $data = new Group();
-        if($request!=null && $request["source"]["type"]=="group"){
-          $data->id_line = $request["source"]["groupId"];
-        }
-        $data->save(); 
       }
     }
   
@@ -218,10 +146,24 @@ class RequestController extends Controller
                $result = Constants::$NOT_FOUND;
             }else{
                //start game
+               $new = new GameSession();
+               $new->game_id = $data->id;
+               $new->starter_id = $request['source']['userId'];
+               $new->group_id = $request['source']['groupId'];
+               $new->status = 0;
+               $new->save();
+               $mess = 'Game telah dimulai, silahkan balas "/join '.$data->game_name.'" untuk mulai bermain.';
+               BOT::replyMessages($request['replyToken'], array(
+                array("type" => "text","text" => $mess)
+               ));
             }
         }
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $result)
         ));
+    }
+    
+    public function doJoinGame($request){
+      
     }
 }

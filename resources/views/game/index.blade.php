@@ -9,6 +9,7 @@
                 <th>Game Name</th>
                 <th>Description</th>
                 <th>Created Date</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tfoot>
@@ -16,6 +17,7 @@
                 <th>Game Name</th>
                 <th>Description</th>
                 <th>Created Date</th>
+                <th>Action</th>
             </tr>
         </tfoot>
         <tbody>
@@ -24,6 +26,7 @@
                 <td>{{$d->game_name}}</td>
                 <td>{{$d->description}}</td>
                 <td>{{$d->created_at}}</td>
+                <td><a href="{{url("/games/".$d->id)}}"><i class="material-icons">send</i></a></td>
             </tr>
             @endforeach
         </tbody>
