@@ -28,4 +28,10 @@ class GroupController extends Controller
         $data->save(); 
       }
     }
+    public static function doLeave($request){
+      $data = Group::where("id_line", $request["source"]["groupId"])->first();
+      if($data!=null){
+        Group::find($data->id)->delete();
+      }
+    }
 }

@@ -18,7 +18,7 @@ class ProductController extends Controller
       }
       return view("product.index", compact(['data']));
     }
-    public function doReplyProducts($request){
+    public static function doReplyProducts($request){
       $data = Product::all()->take(5);
       $messages = array();
       foreach($data as $d){
