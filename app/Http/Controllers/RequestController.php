@@ -46,6 +46,9 @@ class RequestController extends Controller
         case "/join" :
           GameController::doJoinGame($request);
           break; 
+        case "/cancel" :
+          GameController::doCancelGame($request);
+          break; 
       }
       
       //others pattern

@@ -12,7 +12,7 @@ use App\Helpers\STR;
 class KerangController extends Controller
 {
     public static function doReplyKerang($request){
-      $temp = STR::clean(strtolower($request['message']['text']));
+      $temp = STR::clean(trim(strtolower($request['message']['text'])));
       $result = "";
       $arr1 = str_split($temp);
       $sum = 0;

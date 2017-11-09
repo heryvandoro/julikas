@@ -86,15 +86,20 @@ class GameController extends Controller
           $mess = "Mohon maaf ".BOT::getGroupMemberProfile($groupId, $userId)->displayName.", kamu belum add JuliKas sebagai teman. Add dulu ya baru main!";
         }else{
           //search active session
-          $current_session = GameSession::where("group_id", $groupId)->where("status", 0)->get()->first();
+          $current_session = GameSession::getSession($groupId, 0);
           if($current_session==null){
             $mess = "Tidak ada game yang sedang aktif saat ini.";
           }else{
-            $temp = new GameSessionDetail();
-            $temp->game_session_id = $current_session->id;
-            $temp->id_line = $userId;
-            $temp->save();
-            $mess = "OK, ".BOT::getGroupMemberProfile($groupId, $userId)->displayName." kamu sudah join ke game.";
+            $current_session_detail = GameSessionDetail::where("game_session_id", $current_session->id)->where("id_line", $userId)->get()->first();
+            if($current_session_detail==null){
+              $temp = new GameSessionDetail();
+              $temp->game_session_id = $current_session->id;
+              $temp->id_line = $userId;
+              $temp->save();
+              $mess = "OK ".BOT::getGroupMemberProfile($groupId, $userId)->displayName.", selamat bergabung. Kamu sudah join ke game.";
+            }else{
+              $mess = "Anda telah tergabung dalam game ".Game::find($current_session->game_id)->game_name.".";
+            }
           }
         }
         BOT::replyMessages($request['replyToken'], array(
