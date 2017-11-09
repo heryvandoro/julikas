@@ -47,6 +47,8 @@ class RequestController extends Controller
           GameController::doJoinGame($request);
           break; 
       }
+      
+      //others pattern
       if(STR::startsWith($keyword, "/intro")){
         IntroController::doReplyIntroGame($request);
       }elseif(STR::startsWith($keyword, "/create")){

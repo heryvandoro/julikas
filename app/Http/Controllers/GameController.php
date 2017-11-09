@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
 use App\Models\GameSession;
+use App\Models\GameSessionDetail;
 use App\Helpers\BOT;
 use App\Helpers\STR;
 use App\Helpers\Constants;
@@ -46,14 +47,16 @@ class GameController extends Controller
         $result = "";
         if(count($temp)!=2){
             $result = Constants::$NOT_FOUND;
+            $result.= ' Silahkan ketik "/create namagame" untuk memulai game.';
         }else{
             $data = Game::where("game_name", $temp[1])->first();
             if($data==null){
                $result = Constants::$NOT_FOUND;
+               $result.= " Game yang anda maksud tidak ditemukan.";
             }else{
                $active_session = GameSession::where("group_id", $groupId)->where("status", "!=", 2)->get();
                if(count($active_session)!=0){
-                 $mess = "Game : ".Game::find($active_session->first()->game_id)->game_name." sedang aktif. Tidak dapat memulai game lain.";
+                 $mess = 'Game : '.Game::find($active_session->first()->game_id)->game_name.' sedang aktif. Tidak dapat memulai game lain. Silahkan kirim "/join" untuk bergabung dalam game.';
                }else{
                  //start game
                  $new = new GameSession();
@@ -62,7 +65,7 @@ class GameController extends Controller
                  $new->group_id = $groupId;
                  $new->status = 0;
                  $new->save();
-                 $mess = 'Game telah dimulai, silahkan balas "/join '.$data->game_name.'" untuk mulai bermain.';
+                 $mess = 'Game telah dimulai, silahkan balas "/join" untuk mulai bermain.';
                }
                BOT::replyMessages($request['replyToken'], array(
                 array("type" => "text","text" => $mess)
@@ -87,7 +90,11 @@ class GameController extends Controller
           if($current_session==null){
             $mess = "Tidak ada game yang sedang aktif saat ini.";
           }else{
-            $mess = "OK, kamu sudah join ke game.";
+            $temp = new GameSessionDetail();
+            $temp->game_session_id = $current_session->id;
+            $temp->id_line = $userId;
+            $temp->save();
+            $mess = "OK, ".BOT::getGroupMemberProfile($groupId, $userId)->displayName." kamu sudah join ke game.";
           }
         }
         BOT::replyMessages($request['replyToken'], array(
