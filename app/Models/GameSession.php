@@ -10,6 +10,6 @@ class GameSession extends Model
     protected $table="game_sessions";
   
     public function scopeGetSession($query, $groupId, $status){
-      return $query->where("group_id", $groupId)->where("status", $status)->get()->first();
+      return $query->where("group_id", $groupId)->where("status", $status)->get();
     }
 }

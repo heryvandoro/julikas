@@ -86,9 +86,14 @@ class GameController extends Controller
           $mess = "Mohon maaf ".BOT::getGroupMemberProfile($groupId, $userId)->displayName.", kamu belum add JuliKas sebagai teman. Add dulu ya baru main!";
         }else{
           //search active session
-          $current_session = GameSession::getSession($groupId, 0);
+          $current_session = GameSession::getSession($groupId, 0)->first();
           if($current_session==null){
-            $mess = "Tidak ada game yang sedang aktif saat ini.";
+            $now_session = GameSession::getSession($groupId, 1)->first();
+            if($now_session!=null){
+                $mess = "Game sedang berjalan, tidak dapat join.";
+            }else{
+                $mess = "Tidak ada game yang sedang aktif saat ini.";
+            }
           }else{
             $current_session_detail = GameSessionDetail::where("game_session_id", $current_session->id)->where("id_line", $userId)->get()->first();
             if($current_session_detail==null){
@@ -109,5 +114,22 @@ class GameController extends Controller
   
     public static function doStartGame($request){
         
+    }
+  
+    public static function doCancelGame($request){
+        $groupId = $request['source']['groupId'];
+        $userId = $request['source']['userId'];
+        $active_session = GameSession::getSession($groupId, 1)->first();
+        $pending_session = GameSession::getSession($groupId, 0)->first();
+        if($active_session && !$pending_session){
+          $mess = "Game sedang berjalan, tidak dapat melakukan cancel.";
+        }else if(!$active_session && $pending_session){
+          $mess = "Game telah berhasil dicancel.";
+        }else{
+          $mess = "Tidak ada session yang sedang aktif.";
+        }
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => $mess)
+        ));
     }
 }
