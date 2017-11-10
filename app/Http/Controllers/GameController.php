@@ -132,4 +132,21 @@ class GameController extends Controller
           array("type" => "text","text" => $mess)
         ));
     }
+  
+    public static function taskCancel(){
+        $data = GameSession::where("status", 0)->with(['game_session_details'])->get();
+        foreach($data as $d){
+          $now = Carbon::now();
+          $diff = Carbon::parse($d->created_at)->diffInMinutes($now);
+          //after 5 minutes
+          if($diff>=5){
+              $d->status = 2;
+              $d->save();
+              BOT::pushMessages($d->group_id, array(
+                array("type" => "text","text" => 'Game telah expired. Silahkan kirim "/create namagame" untuk memulai game baru.')
+              ));
+              $d->delete();
+          }
+        }
+    }
 }

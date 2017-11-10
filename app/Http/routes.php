@@ -14,3 +14,5 @@ Route::get("/users", "UserController@index");
 Route::get("/groups", "GroupController@index");
 Route::get("/games", "GameController@index");
 Route::get("/games/{game_id}", "GameController@detail");
+
+Route::get('/coba', "GameController@taskCancel");

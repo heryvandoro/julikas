@@ -29,6 +29,13 @@ class BOT{
        ]);
     }
   
+    public static function pushMessages($to, $messages){
+       self::makeRequest("POST", "message/push", [
+         "to" => $to,
+         "messages" => $messages
+       ]);
+    }
+  
     public static function getProfile($user_id){
        return self::makeRequest("GET", "profile/".$user_id);
     }
