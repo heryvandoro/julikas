@@ -40,37 +40,41 @@ class GameController extends Controller
   
     public static function doCreateGame($request){
         $temp = STR::clean(strtolower($request['message']['text']));
-        $groupId = $request['source']['groupId'];
-        $starterId = $request['source']['userId'];
-      
-        $temp = explode("-", $temp);
-        $result = "";
-        if(count($temp)!=2){
-            $result = Constants::$NOT_FOUND;
-            $result.= ' Silahkan ketik "/create namagame" untuk memulai game.';
+        if(isset($request['source']['groupId'])){
+          $groupId = $request['source']['groupId'];
+          $starterId = $request['source']['userId'];
+
+          $temp = explode("-", $temp);
+          $result = "";
+          if(count($temp)!=2){
+              $result = Constants::$NOT_FOUND;
+              $result.= ' Silahkan ketik "/create namagame" untuk memulai game.';
+          }else{
+              $data = Game::where("game_name", $temp[1])->first();
+              if($data==null){
+                 $result = Constants::$NOT_FOUND;
+                 $result.= " Game yang anda maksud tidak ditemukan.";
+              }else{
+                 $active_session = GameSession::where("group_id", $groupId)->where("status", "!=", 2)->get();
+                 if(count($active_session)!=0){
+                   $mess = 'Game : '.Game::find($active_session->first()->game_id)->game_name.' sedang aktif. Tidak dapat memulai game lain. Silahkan kirim "/join" untuk bergabung dalam game.';
+                 }else{
+                   //start game
+                   $new = new GameSession();
+                   $new->game_id = $data->id;
+                   $new->starter_id = $starterId;
+                   $new->group_id = $groupId;
+                   $new->status = 0;
+                   $new->save();
+                   $mess = 'Game telah dimulai, silahkan balas "/join" untuk mulai bermain.';
+                 }
+                 BOT::replyMessages($request['replyToken'], array(
+                  array("type" => "text","text" => $mess)
+                 ));
+              }
+          }
         }else{
-            $data = Game::where("game_name", $temp[1])->first();
-            if($data==null){
-               $result = Constants::$NOT_FOUND;
-               $result.= " Game yang anda maksud tidak ditemukan.";
-            }else{
-               $active_session = GameSession::where("group_id", $groupId)->where("status", "!=", 2)->get();
-               if(count($active_session)!=0){
-                 $mess = 'Game : '.Game::find($active_session->first()->game_id)->game_name.' sedang aktif. Tidak dapat memulai game lain. Silahkan kirim "/join" untuk bergabung dalam game.';
-               }else{
-                 //start game
-                 $new = new GameSession();
-                 $new->game_id = $data->id;
-                 $new->starter_id = $starterId;
-                 $new->group_id = $groupId;
-                 $new->status = 0;
-                 $new->save();
-                 $mess = 'Game telah dimulai, silahkan balas "/join" untuk mulai bermain.';
-               }
-               BOT::replyMessages($request['replyToken'], array(
-                array("type" => "text","text" => $mess)
-               ));
-            }
+          $result = "Maaf, game hanya bisa dimulai dalam group.";
         }
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $result)
