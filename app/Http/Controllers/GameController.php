@@ -180,16 +180,12 @@ class GameController extends Controller
               $pending_session->status = 1;
               $pending_session->save();
               //$mess = "Game telah dimulai!";
-              self::doSendQuestion($groupId);
+              KejarController::doSendQuestion($groupId);
             }
           }
         }
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $mess)
         ));
-    }
-  
-    public static function doSendQuestion($groupId){
-      
     }
 }
