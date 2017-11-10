@@ -124,7 +124,14 @@ class GameController extends Controller
         if($active_session && !$pending_session){
           $mess = "Game sedang berjalan, tidak dapat melakukan cancel.";
         }else if(!$active_session && $pending_session){
-          $mess = "Game telah berhasil dicancel.";
+          if($pending_session->starter_id==$userId){
+            $pending_session->status = 2;
+            $pending_session->save();
+            $pending_session->delete();
+            $mess = "Game telah berhasil dicancel.";
+          }else{
+            $mess = "Tidak bisa melakukan cancel game. Hanya starter game yang dapat melakukannya.";
+          }
         }else{
           $mess = "Tidak ada session yang sedang aktif.";
         }
