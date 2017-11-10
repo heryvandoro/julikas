@@ -9,8 +9,8 @@ class GameSession extends Model
     use SoftDeletes;
     protected $table="game_sessions";
   
-    public function game_session_details(){
-        return $this->hasMany("App\Models\GameSessionDetail", "game_session_id", "id");
+    public function game_session_users(){
+        return $this->hasMany("App\Models\GameSessionUser", "game_session_id", "id");
     }
   
     public function scopeGetSession($query, $groupId, $status){

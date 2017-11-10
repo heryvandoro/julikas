@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use SoftDeletes;
 
-class GameSessionDetail extends Model
+class GameSessionUser extends Model
 {
     use SoftDeletes;
-    protected $table = "game_session_details";
+    protected $table = "game_session_users";
 }

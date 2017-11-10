@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Game;
 use App\Models\GameSession;
-use App\Models\GameSessionDetail;
+use App\Models\GameSessionUser;
 use App\Helpers\BOT;
 use App\Helpers\STR;
 use App\Helpers\Constants;
@@ -99,9 +99,9 @@ class GameController extends Controller
                 $mess = "Tidak ada game yang sedang aktif saat ini.";
             }
           }else{
-            $current_session_detail = GameSessionDetail::where("game_session_id", $current_session->id)->where("id_line", $userId)->get()->first();
+            $current_session_detail = GameSessionUser::where("game_session_id", $current_session->id)->where("id_line", $userId)->get()->first();
             if($current_session_detail==null){
-              $temp = new GameSessionDetail();
+              $temp = new GameSessionUser();
               $temp->game_session_id = $current_session->id;
               $temp->id_line = $userId;
               $temp->save();
@@ -170,7 +170,7 @@ class GameController extends Controller
             $mess = "Game sedang berjalan, tidak dapat melakukan start lagi.";
           }
         }else{
-          $temp = GameSessionDetail::where("game_session_id", $pending_session->id)->get();
+          $temp = GameSessionUser::where("game_session_id", $pending_session->id)->get();
           if($temp->count()<2){
             $mess = "Minimal 2 pemain untuk memulai game.";
           }else{
@@ -179,12 +179,17 @@ class GameController extends Controller
             }else{
               $pending_session->status = 1;
               $pending_session->save();
-              $mess = "Game telah dimulai!";
+              //$mess = "Game telah dimulai!";
+              self::doSendQuestion($groupId);
             }
           }
         }
         BOT::replyMessages($request['replyToken'], array(
           array("type" => "text","text" => $mess)
         ));
+    }
+  
+    public static function doSendQuestion($groupId){
+      
     }
 }
