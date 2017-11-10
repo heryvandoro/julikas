@@ -61,6 +61,8 @@ class RequestController extends Controller
         IntroController::doReplyIntroGame($request);
       }elseif(STR::startsWith($keyword, "/create")){
         GameController::doCreateGame($request);
+      }elseif(STR::startsWith($keyword, "/jawab")){
+        KejarController::doJawab($request);
       }elseif(STR::startsWith($keyword, "apakah")){
         KerangController::doReplyKerang($request);
       }else{

@@ -18,11 +18,10 @@ class KejarController extends Controller
         $active_session = GameSession::getSession($groupId, 1)->first();
         if($active_session!=null){
            $active_questions = GameSessionQuestion::where("game_session_id", $active_session->id)->with(['question.answers'])->get();
-           $all_answers = array_values(GameSessionAnswer
-                                       ::select('answer_id')
-                                       ->where("game_session_id", $active_session->id)
-                                       ->get()->toArray()
-                                      );
+           $all_answers = GameSessionAnswer
+                         ::select('answer_id')
+                         ->where("game_session_id", $active_session->id)
+                         ->get()->toArray();
            $que = $active_questions->last();
            $result = "";
            $result .= $active_questions->count().". ".$que->question->text."\n";
@@ -38,5 +37,29 @@ class KejarController extends Controller
               array("type"=>"text", "text"=>$result)
            ));
         }
+    }
+  
+    public static function doJawab($request){
+      $groupId = $request['source']['groupId'];
+      $userId = $request['source']['userId'];
+      $active_session = GameSession::getSession($groupId, 1)->first();
+      if($active_session!=null){
+        $active_questions = GameSessionQuestion::where("game_session_id", $active_session->id)->with(['question.answers'])->get()->last();
+        $user_answer = str_replace("/jawab ",  "", trim(strtolower($request['message']['text'])));
+        $temp = Answer::where("text", $user_answer)
+                ->where("question_id", $active_questions->question_id)
+                ->first();
+        if($temp!=null){
+          $new_ans = new GameSessionAnswer();
+          $new_ans->game_session_id = $active_session->id;
+          $new_ans->answer_id = $temp->id;
+          $new_ans->save();
+          return self::doSendQuestion($active_session->group_id);
+        }else{
+          BOT::pushMessages($active_session->group_id, array(
+              array("type"=>"text", "text"=>"wadu petrik")
+           ));
+        }
+      }
     }
 }
