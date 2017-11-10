@@ -26,6 +26,8 @@ class RequestController extends Controller
           break;
           case "leave" : GroupController::doLeave($source);
           break;
+          case "postback" : $this->doPostback($source);
+          break;
       }
       return response()->json(["status"=>200]);
     } 
@@ -65,4 +67,8 @@ class RequestController extends Controller
         UnknownController::doUnknown($request);
       }
     } 
+    
+    public function doPostBack($request){
+      CategoryController::doReplySubCategory($request);
+    }
 }

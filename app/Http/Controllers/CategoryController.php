@@ -28,7 +28,7 @@ class CategoryController extends Controller
                             [
                                 "type"=> "postback",
                                 "label"=> "View Sub Category",
-                                "data"=> "test"
+                                "data"=> $d->id
                             ],
                        ]
             ));
@@ -36,6 +36,34 @@ class CategoryController extends Controller
       array_push($messages, array(
           "type" => "template",
           "altText"=> "Parent Category",
+          "template" => [
+              "type" => "carousel",
+              "columns" => $item
+          ])
+      );
+      BOT::replyMessages($request['replyToken'], $messages);
+    }
+  
+    public static function doReplySubCategory($request){
+      $data = CategoryParent::with(['categories'])->find($request['postback']['data']);
+      $messages = array();
+      $item = array();
+      foreach($data->categories as $d){
+         array_push($item, array(
+            "title"=> "Category",
+            "text"=> $d->category_name,
+            "actions"=> [
+                            [
+                                "type"=> "postback",
+                                "label"=> "View Products",
+                                "data"=> $d->id
+                            ],
+                       ]
+            ));
+      }
+      array_push($messages, array(
+          "type" => "template",
+          "altText"=> "Sub Category",
           "template" => [
               "type" => "carousel",
               "columns" => $item
