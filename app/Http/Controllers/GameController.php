@@ -112,10 +112,6 @@ class GameController extends Controller
         ));
     }
   
-    public static function doStartGame($request){
-        
-    }
-  
     public static function doCancelGame($request){
         $groupId = $request['source']['groupId'];
         $userId = $request['source']['userId'];
@@ -155,5 +151,36 @@ class GameController extends Controller
               $d->delete();
           }
         }
+    }
+  
+    public static function doStartGame($request){
+        $groupId = $request['source']['groupId'];
+        $userId = $request['source']['userId'];
+        $mess = "";
+        $pending_session = GameSession::getSession($groupId, 0)->first();
+        if($pending_session==null){
+          $active_session = GameSession::getSession($groupId, 1)->first();
+          if($active_session==null){
+            $mess = "Tidak ada session aktif saat ini.";  
+          }else{
+            $mess = "Game sedang berjalan, tidak dapat melakukan start lagi.";
+          }
+        }else{
+          $temp = GameSessionDetail::where("game_session_id", $pending_session->id)->get();
+          if($temp->count()<2){
+            $mess = "Minimal 2 pemain untuk memulai game.";
+          }else{
+            if($pending_session->starter_id!=$userId){
+              $mess = "Maaf, game hanya dapat dimulai oleh starter.";
+            }else{
+              $pending_session->status = 1;
+              $pending_session->save();
+              $mess = "Game telah dimulai!";
+            }
+          }
+        }
+        BOT::replyMessages($request['replyToken'], array(
+          array("type" => "text","text" => $mess)
+        ));
     }
 }
