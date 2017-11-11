@@ -14,6 +14,7 @@ use App\Helpers\BOT;
 use App\Models\Answer;
 use App\Models\Question;
 use DB;
+use Carbon\Carbon;
 
 class KejarController extends Controller
 {
@@ -94,5 +95,22 @@ class KejarController extends Controller
        $data->game_session_id = $session_id;
        $data->question_id = $result->id;
        $data->save();
+    }
+    
+    public static function taskSkipAndCancel(){
+        $data = GameSession::where("status", 1)->with(["game_session_questions"])->get();
+        foreach($data as $d){
+          $now = Carbon::now();
+          $temp = $d->game_session_questions->last();
+          $diff = Carbon::parse($temp->created_at)->diffInMinutes($now);
+          //after 3 minutes
+          if($diff>=3){
+              BOT::pushMessages($d->group_id, array(
+                array("type"=>"text", "text"=>"Question expired, ganti pertanyaan!")
+              ));
+              self::randomQuestion($d->id);
+              return self::doSendQuestion($d->group_id);
+          }
+        }
     }
 }

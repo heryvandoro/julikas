@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\KejarController;
 
 class Kernel extends ConsoleKernel
 {
@@ -26,7 +27,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function(){
+          //cancel pending game (not started)
           GameController::taskCancel();
+          //skip question > 3 minutes (kejar100)
+          KejarController::taskSkipAndCancel();
         })->everyMinute();
     }
 }

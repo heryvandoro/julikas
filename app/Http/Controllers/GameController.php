@@ -141,7 +141,7 @@ class GameController extends Controller
     }
   
     public static function taskCancel(){
-        $data = GameSession::where("status", 0)->with(['game_session_details'])->get();
+        $data = GameSession::where("status", 0)->get();
         foreach($data as $d){
           $now = Carbon::now();
           $diff = Carbon::parse($d->created_at)->diffInMinutes($now);
