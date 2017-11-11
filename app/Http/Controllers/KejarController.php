@@ -90,7 +90,19 @@ class KejarController extends Controller
     }
   
     public static function randomQuestion($session_id){
-       $result = Question::orderBy(DB::raw('RAND()'))->get()->first();
+       $temp = GameSessionQuestion::where("game_session_id", $session_id)->get()->count();
+       if($temp>=5){
+         $sess = GameSession::find($session_id);
+         BOT::pushMessages($sess->group_id, array(
+          array("type"=>"text", "text"=>"Game telah berakhir! Thankyou petrik :D")
+         ));
+         $sess->status = 2;
+         $sess->save();
+         return $sess->delete();
+       }
+       do{
+          $result = Question::orderBy(DB::raw('RAND()'))->get()->first();
+       }while(GameSessionQuestion::where("game_session_id", $session_id)->where("question_id", $result->id)->get()->first()!=null);
        $data = new GameSessionQuestion();
        $data->game_session_id = $session_id;
        $data->question_id = $result->id;
