@@ -117,11 +117,15 @@ class KejarController extends Controller
           $diff = Carbon::parse($temp->created_at)->diffInMinutes($now);
           //after 3 minutes
           if($diff>=3){
-              BOT::pushMessages($d->group_id, array(
-                array("type"=>"text", "text"=>"Question expired, ganti pertanyaan!")
-              ));
-              self::randomQuestion($d->id);
-              return self::doSendQuestion($d->group_id);
+              if($d->game_session_questions->count()<5){
+                BOT::pushMessages($d->group_id, array(
+                  array("type"=>"text", "text"=>"Question expired, ganti pertanyaan!")
+                ));
+                self::randomQuestion($d->id);
+                self::doSendQuestion($d->group_id);
+              }else{
+                self::randomQuestion($d->id);
+              }
           }
         }
     }
