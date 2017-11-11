@@ -180,6 +180,7 @@ class GameController extends Controller
               $pending_session->status = 1;
               $pending_session->save();
               //$mess = "Game telah dimulai!";
+              KejarController::randomQuestion($pending_session->id);
               return KejarController::doSendQuestion($groupId);
             }
           }
