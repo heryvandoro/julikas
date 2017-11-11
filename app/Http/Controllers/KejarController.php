@@ -66,11 +66,16 @@ class KejarController extends Controller
                   ->where("question_id", $active_questions->question_id)
                   ->first();
           if($temp!=null){
-            $new_ans = new GameSessionAnswer();
-            $new_ans->game_session_id = $active_session->id;
-            $new_ans->answer_id = $temp->id;
-            $new_ans->save();
-            return self::doSendQuestion($active_session->group_id);
+            $ans = GameSessionAnswer::where("game_session_id", $active_session->id)->where("answer_id", $temp->id)->get()->first();
+            if($ans==null){
+              $new_ans = new GameSessionAnswer();
+              $new_ans->game_session_id = $active_session->id;
+              $new_ans->answer_id = $temp->id;
+              $new_ans->save();
+              return self::doSendQuestion($active_session->group_id);
+            }else{
+              $mess = "Jawaban sama petrik!";
+            }
           }else{
             $mess = "Jawaban salah petrik!";
           }
